@@ -1,0 +1,33 @@
+SELECT * FROM
+(SELECT Id AS c_id, PostId AS a_id, Score AS score, Text AS text, CreationDate AS c_date, UserId AS u_id
+FROM `sotorrent-org.2020_12_31.Comments` 
+WHERE UPPER(text) LIKE 'DEPRECATED' 
+    OR UPPER(text) LIKE 'OUTDATED' 
+    OR UPPER(text) LIKE 'OBSOLETE'
+    OR UPPER(text) LIKE 'OUT OF DATE') c
+LEFT JOIN  (SELECT Id AS a_id,CreationDate AS a_date,CommentCount AS c_count,OwnerUserId AS u_id, ParentId AS p_id
+             FROM `sotorrent-org.2020_12_31.Posts`
+                WHERE  PostTypeId=2 
+                    AND UPPER(Body) NOT LIKE 'DEPRECATED' 
+                    AND UPPER(Body) NOT LIKE 'OUTDATED'
+                    AND UPPER(Body) NOT LIKE 'OBSOLETE'
+                    AND UPPER(Body) NOT LIKE 'OUT OF DATE'
+                    ) a 
+                    ON c.a_id = a.a_id
+LEFT JOIN (SELECT Id AS p_id,CreationDate AS p_date,AnswerCount AS a_count,Tags AS tags
+             FROM `sotorrent-org.2020_12_31.Posts`
+                WHERE  PostTypeId=1 
+                    AND UPPER(Body) NOT LIKE 'DEPRECATED' 
+                    AND UPPER(Body) NOT LIKE 'OUTDATED'
+                    AND UPPER(Body) NOT LIKE 'OBSOLETE'
+                    AND UPPER(Body) NOT LIKE 'OUT OF DATE'
+                    AND UPPER(Title) NOT LIKE 'DEPRECATED' 
+                    AND UPPER(Title) NOT LIKE 'OUTDATED'
+                    AND UPPER(Title) NOT LIKE 'OBSOLETE'
+                    AND UPPER(Title) NOT LIKE 'OUT OF DATE'
+                    ) p 
+                    ON p.p_id = a.p_id
+LEFT JOIN (SELECT Id AS u_id,Reputation AS reputation,Age AS age
+             FROM `sotorrent-org.2020_12_31.Users`
+                    ) u 
+                    ON c.u_id = u.u_id
